@@ -63,7 +63,7 @@ fi
 mkdir lheevent; cd lheevent
 
 #untar the tarball directly from cvmfs
-tar -xaf ${path} 
+tar -xaf ${path}
 
 # If TMPDIR is unset, set it to the condor scratch area if present
 # and fallback to /tmp
@@ -83,23 +83,9 @@ make
 # prob(4q) : pro(lvqq) = 1:2
 # 5 W(2q)
 # 10 W(lnu or taunu)
-CHOICE=(1 2 3)
-if [ ${CHOICE[RANDOM%3]} == "1" ]; then
-  JHUCMD="DecayMode1=5 DecayMode2=5"
-else
-  JHUCMD="DecayMode1=10 DecayMode2=5"
-fi
-SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-# 1. switch the two higgs boson
-python ${SCRIPT_DIR}/lhe_modifier.py -m switch -i ${JHUBASE}/cmsgrid_final.lhe -o ${JHUBASE}/cmsgrid_final_s.lhe
-# 2. use JHUGen to decay the "last" higgs
-./JHUGen ReadLHE=${JHUBASE}/cmsgrid_final_s.lhe DataFile=${JHUBASE}/cmsgrid_final_s_jhu.lhe ${JHUCMD}
-# 3. switch the two higgs boson again
-python ${SCRIPT_DIR}/lhe_modifier.py -m switch -i ${JHUBASE}/cmsgrid_final_s_jhu.lhe -o ${JHUBASE}/cmsgrid_final_s_jhu_s.lhe
-# 4. use JHUGen to decay the "last" higgs (i.e. the real last higgs)
-./JHUGen ReadLHE=${JHUBASE}/cmsgrid_final_s_jhu_s.lhe DataFile=${JHUBASE}/cmsgrid_final_s_jhu_s_jhu.lhe ${JHUCMD}
-# 5. correct the LHE
-python ${SCRIPT_DIR}/lhe_modifier.py -m correct -i ${JHUBASE}/cmsgrid_final_s_jhu_s_jhu.lhe -o ${JHUBASE}/cmsgrid_final_s_jhu_s_jhu_c.lhe
+
+# use JHUGen to decay the "last" higgs
+./JHUGen ReadLHE=${JHUBASE}/cmsgrid_final_s.lhe DataFile=${JHUBASE}/cmsgrid_final_s_jhu.lhe DecayMode1=5 DecayMode2=5
 
 popd
 rm -rf cmsgrid_final.lhe
@@ -115,7 +101,3 @@ cd $LHEWORKDIR
 rm -rf lheevent
 
 exit 0
-
-
-
-
