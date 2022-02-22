@@ -12,7 +12,6 @@ NTHREAD=$3
 FRAGMENT=fragments/HHToBBVVToBBQQQQ_cHHH1_fragment.py
 CMSTARBALL=genmodules.tgz
 LHESCRIPT=run_generic_tarball_cvmfs_jhu.sh
-LHEEXTSCRIPT=lhe_modifier.py
 [ -f $FRAGMENT ] || exit $? ;
 
 WORKDIR=`pwd`
@@ -36,16 +35,17 @@ eval `scram runtime -sh`
 tar xzf $WORKDIR/$CMSTARBALL
 sed -i "s/run_generic_tarball_cvmfs/run_generic_tarball_cvmfs_jhu/g" GeneratorInterface/Core/src/BaseHadronizer.cc
 cp $WORKDIR/$LHESCRIPT GeneratorInterface/LHEInterface/data/$LHESCRIPT
-cp $WORKDIR/$LHEEXTSCRIPT GeneratorInterface/LHEInterface/data/$LHEEXTSCRIPT
 chmod +x GeneratorInterface/LHEInterface/data/$LHESCRIPT
 # git cms-checkdeps -a # to save time because we don't change much of the code
 
 ######## (END) ########
+FRAGMENT0=(${FRAGMENT//\// })
+FRAGMENT0=${FRAGMENT0[-1]}
 
-mkdir -p Configuration/GenProduction/python/
-cp $WORKDIR/$FRAGMENT Configuration/GenProduction/python/
+mkdir -p Configuration/GenProduction/python
+cp $WORKDIR/$FRAGMENT Configuration/GenProduction/python
 # replace the event number (no __NEVENT__ in this fragment)
-sed "s/__NEVENT__/$NEVENT/g" -i Configuration/GenProduction/python/$FRAGMENT
+sed "s/__NEVENT__/$NEVENT/g" -i Configuration/GenProduction/python/$FRAGMENT0
 eval `scram runtime -sh`
 scram b -j $NTHREAD
 
@@ -57,8 +57,7 @@ cd $WORKDIR
 # begin LHEGEN
 # SEED=$(($(date +%s) % 100000 + 1)) use seed from input argument
 
-FRAGMENT0=(${FRAGMENT//\// })
-FRAGMENT0=${FRAGMENT0[-1]}
+echo $FRAGMENT0
 cmsDriver.py Configuration/GenProduction/python/$FRAGMENT0 --python_filename JME-RunIISummer19UL17GEN-00016_1_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN --fileout file:lhegen.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --customise_commands "process.source.numberEventsInLuminosityBlock = cms.untracked.uint32(200)"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(100)" --step GEN --geometry DB:Extended --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
 # begin SIM
