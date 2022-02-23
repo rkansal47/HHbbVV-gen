@@ -29,7 +29,7 @@ def main(args):
     
     seedfile = f"{locdir}/seed.txt"
     f = open(seedfile, "w")
-    for i in range(1):
+    for i in range(args.start,args.end):
         f.write("%i\n"%i)
     f.close()
             
@@ -54,6 +54,8 @@ if __name__ == "__main__":
     parser.add_argument("--tag",       dest="tag",       default="Test",                help="process tag", type=str)
     parser.add_argument('--sample',    dest='sample',    choices=["jhu_HHbbVV","pythia_HHbbVV"], help='sample')
     parser.add_argument("--submit",    dest='submit',    action='store_true',           help="submit jobs when created")
+    parser.add_argument("--start",     dest='start',     default=1,                     help="start seed >0", type=int)
+    parser.add_argument("--end",       dest='end',       default=1000,                  help="endseed", type=int)
     args = parser.parse_args()
 
     main(args)
