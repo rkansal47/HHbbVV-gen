@@ -85,11 +85,11 @@ make
 # 10 W(lnu or taunu)
 
 # use JHUGen to decay the "last" higgs
-./JHUGen ReadLHE=${JHUBASE}/cmsgrid_final_s.lhe DataFile=${JHUBASE}/cmsgrid_final_s_jhu.lhe DecayMode1=5 DecayMode2=5
+./JHUGen ReadLHE=${JHUBASE}/cmsgrid_final.lhe DataFile=${JHUBASE}/cmsgrid_final_jhu.lhe DecayMode1=5 DecayMode2=5
 
 popd
 rm -rf cmsgrid_final.lhe
-mv cmsgrid_final_s_jhu_s_jhu_c.lhe cmsgrid_final.lhe
+mv cmsgrid_final_jhu.lhe cmsgrid_final.lhe
 
 ########## END ##########
 
