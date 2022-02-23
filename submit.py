@@ -11,8 +11,8 @@ def main(args):
     localcondor = f"{locdir}/submit_{sample}.jdl"
     executable = f"onestop_ul_{sample}.sh"
     localexecutable = f"{locdir}/{executable}"
-    odir = f"root://cmseos.fnal.gov//store/user/lpcdihiggsboost/genHHbbVV/ULv1/{tag}/"
-    odir_ul = f"root://cmseos.fnal.gov//store/user/lpcdihiggsboost/genHHbbVV/ULv2/{tag}/"
+    odir = f"root://cmseos.fnal.gov//store/user/lpcdihiggsboost/gen/{sample}/ULv1/{tag}/"
+    odir_ul = f"root://cmseos.fnal.gov//store/user/lpcdihiggsboost/gen/{sample}/ULv2/{tag}/"
 
     exe_templ_file = open(executable)
     exe_file = open(localexecutable, "w")
@@ -52,7 +52,7 @@ if __name__ == "__main__":
             
     parser = argparse.ArgumentParser()
     parser.add_argument("--tag",       dest="tag",       default="Test",                help="process tag", type=str)
-    parser.add_argument('--sample',    dest='sample',    choices=["jhu_HHbbVV","pythia_HHbbVV"], help='sample')
+    parser.add_argument('--sample',    dest='sample',    choices=["jhu_HHbbWW","pythia_HHbbWW","jhu_HHbbZZ"], help='sample')
     parser.add_argument("--submit",    dest='submit',    action='store_true',           help="submit jobs when created")
     parser.add_argument("--start",     dest='start',     default=1,                     help="start seed >0", type=int)
     parser.add_argument("--end",       dest='end',       default=1000,                  help="endseed", type=int)
