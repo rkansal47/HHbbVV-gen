@@ -8,9 +8,7 @@ externalLHEProducer = cms.EDProducer(
     nEvents=cms.untracked.uint32(10),
     numberOfParameters=cms.uint32(1),
     outputFile=cms.string("cmsgrid_final.lhe"),
-    scriptName=cms.FileInPath(
-        "GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs_jhu.sh"
-    ),
+    scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh'),
 )
 
 from Configuration.Generator.Pythia8CommonSettings_cfi import *
@@ -34,7 +32,10 @@ generator = cms.EDFilter(
             "POWHEG:nFinal = 2",
             "25:onMode = off",
             "25:onIfMatch = 5 -5",
+            '25:onIfMatch = 24 -24',
             "ResonanceDecayFilter:filter = on",
+            "ResonanceDecayFilter:mothers = 25",
+            "ResonanceDecayFilter:daughters = 5,5,24,24",
         ),
         parameterSets=cms.vstring(
             "pythia8CommonSettings",
