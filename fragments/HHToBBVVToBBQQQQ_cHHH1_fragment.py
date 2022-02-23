@@ -16,6 +16,7 @@ externalLHEProducer = cms.EDProducer(
 from Configuration.Generator.Pythia8CommonSettings_cfi import *
 from Configuration.Generator.MCTunes2017.PythiaCP5Settings_cfi import *
 from Configuration.Generator.PSweightsPythia.PythiaPSweightsSettings_cfi import *
+from Configuration.Generator.Pythia8PowhegEmissionVetoSettings_cfi import *
 
 generator = cms.EDFilter(
     "Pythia8HadronizerFilter",

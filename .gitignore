@@ -1,2 +1,5 @@
 CMSSW*
 *.tgz
+*.root
+.*
+*cfg.py
