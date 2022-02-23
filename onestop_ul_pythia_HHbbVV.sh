@@ -9,9 +9,8 @@ env
 NEVENT=$1
 SEED=$2 # no use here
 NTHREAD=$3
-FRAGMENT=fragments/HHToBBVVToBBQQQQ_cHHH1_fragment.py
+FRAGMENT=fragments/HHToBBVVToBBQQQQ_cHHH1_pythia_fragment.py
 CMSTARBALL=genmodules.tgz
-LHESCRIPT=run_generic_tarball_cvmfs_jhu.sh
 [ -f $FRAGMENT ] || exit $? ;
 
 WORKDIR=`pwd`
@@ -29,21 +28,12 @@ fi
 cd $RELEASE/src
 eval `scram runtime -sh`
 
-######## Plugin the JHUGen ########
-# git cms-addpkg GeneratorInterface/Core
-# git cms-addpkg GeneratorInterface/LHEInterface
-tar xzf $WORKDIR/$CMSTARBALL
-sed -i "s/run_generic_tarball_cvmfs/run_generic_tarball_cvmfs_jhu/g" GeneratorInterface/Core/src/BaseHadronizer.cc
-cp $WORKDIR/$LHESCRIPT GeneratorInterface/LHEInterface/data/$LHESCRIPT
-chmod +x GeneratorInterface/LHEInterface/data/$LHESCRIPT
-# git cms-checkdeps -a # to save time because we don't change much of the code
-
-######## (END) ########
 FRAGMENT0=(${FRAGMENT//\// })
 FRAGMENT0=${FRAGMENT0[-1]}
 
 mkdir -p Configuration/GenProduction/python
 cp $WORKDIR/$FRAGMENT Configuration/GenProduction/python
+ls -lrth Configuration/GenProduction/python/
 # replace the event number (no __NEVENT__ in this fragment)
 sed "s/__NEVENT__/$NEVENT/g" -i Configuration/GenProduction/python/$FRAGMENT0
 eval `scram runtime -sh`
@@ -57,8 +47,9 @@ cd $WORKDIR
 # begin LHEGEN
 # SEED=$(($(date +%s) % 100000 + 1)) use seed from input argument
 
+##NOTE: NEED TO CHANGE THE SEED!
 echo $FRAGMENT0
-cmsDriver.py Configuration/GenProduction/python/$FRAGMENT0 --python_filename JME-RunIISummer19UL17GEN-00016_1_cfg.py --eventcontent LHE,RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier LHE,GEN --fileout file:lhegen.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --customise_commands "process.source.numberEventsInLuminosityBlock = cms.untracked.uint32(200)"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(100)" --step LHE,GEN --geometry DB:Extended --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+cmsDriver.py Configuration/GenProduction/python/$FRAGMENT0 --python_filename JME-RunIISummer19UL17GEN-00016_1_cfg.py --eventcontent LHE,RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier LHE,GEN --fileout file:lhegen.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --customise_commands "process.source.numberEventsInLuminosityBlock = cms.untracked.uint32(200)"\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" --step LHE,GEN --geometry DB:Extended --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
 # begin SIM
 cmsDriver.py  --python_filename JME-RunIISummer19UL17SIM-00010_1_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --fileout file:sim.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --step SIM --geometry DB:Extended --filein file:lhegen_inRAWSIM.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
@@ -93,25 +84,9 @@ cmsDriver.py  --python_filename JME-RunIISummer19UL17MiniAOD-00020_1_cfg.py --ev
 
 cmsDriver.py  --python_filename JME-RunIISummer19UL17MiniAOD-00020_1_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniaod_20ul.root --conditions 106X_mc2017_realistic_v9 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
-# mv wmlhegs.root wmlhegs_${SEED}.root
-# mv miniaod.root miniaod_${SEED}.root
-# mv miniaod_20ul.root miniaod_20ul_${SEED}.root
+mv lhegen_inRAWSIM.root lhegen_inRAWSIM_${SEED}.root
+mv miniaod.root miniaod_${SEED}.root
+mv miniaod_20ul.root miniaod_20ul_${SEED}.root
 
-
-############ Start DNNTuples ############
-# use CMSSW_11_1_0_pre8 which has Puppi V14
-# export SCRAM_ARCH=slc7_amd64_gcc820
-# scram p CMSSW CMSSW_11_1_0_pre8
-# cd CMSSW_11_1_0_pre8/src
-# eval `scram runtime -sh`
-#
-# git cms-addpkg PhysicsTools/ONNXRuntime
-# # clone this repo into "DeepNTuples" directory
-# git clone https://github.com/colizz/DNNTuples.git DeepNTuples -b dev-UL-hww
-# # Use a faster version of ONNXRuntime
-# $CMSSW_BASE/src/DeepNTuples/Ntupler/scripts/install_onnxruntime.sh
-# scram b -j $NTHREAD
-#
-# cd DeepNTuples/Ntupler/test/
-# cmsRun DeepNtuplizerAK8.py inputFiles=file:${WORKDIR}/miniaod.root
-# mv output.root ${WORKDIR}/output.root
+xrdcp -r -f miniaod_${SEED}.root OUTPUT_DIR/miniaod_${SEED}.root
+xrdcp -r -f miniaod_20ul_${SEED}.root OUTPUT_ULDIR/miniaod_20ul_${SEED}.root
