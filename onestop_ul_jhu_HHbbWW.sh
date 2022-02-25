@@ -62,12 +62,25 @@ cd $WORKDIR
 echo $FRAGMENT0
 #process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})"
 cmsDriver.py Configuration/GenProduction/python/$FRAGMENT0 --python_filename JME-RunIISummer19UL17GEN-00016_1_cfg.py --eventcontent LHE,RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier LHE,GEN --fileout file:lhegen.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --customise_commands "process.source.numberEventsInLuminosityBlock = cms.untracked.uint32(200)"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(100)"\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" --step LHE,GEN --geometry DB:Extended --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+ls -lrth 
 
 # begin SIM
+echo "SIM"
 cmsDriver.py  --python_filename JME-RunIISummer19UL17SIM-00010_1_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --fileout file:sim.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --step SIM --geometry DB:Extended --filein file:lhegen_inRAWSIM.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+#rm lhegen.root
+#rm lhegen_inRAWSIM.root
+rm -rf lheevent
+ls -lrth 
 
 # begin DRPremix
-cmsDriver.py  --python_filename JME-RunIISummer19UL17DIGIPremix-00010_1_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-DIGI --fileout file:digi.root --pileup_input "dbs:/Neutrino_E-10_gun/RunIISummer20ULPrePremix-UL17_106X_mc2017_realistic_v6-v3/PREMIX" --conditions 106X_mc2017_realistic_v6 --step DIGI,DATAMIX,L1,DIGI2RAW --procModifiers premix_stage2 --geometry DB:Extended --filein file:sim.root --datamix PreMix --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT > digi.log 2>&1 || exit $? ; # too many output, log into file
+echo "DRPremix"
+#cmsDriver.py  --python_filename JME-RunIISummer19UL17DIGIPremix-00010_1_cfg.py --eventcontent PREMIXRAW --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-DIGI --fileout file:digi.root --pileup_input "dbs:/Neutrino_E-10_gun/RunIISummer20ULPrePremix-UL17_106X_mc2017_realistic_v6-v3/PREMIX" --conditions 106X_mc2017_realistic_v6 --step DIGI,DATAMIX,L1,DIGI2RAW --procModifiers premix_stage2 --geometry DB:Extended --filein file:sim.root --datamix PreMix --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT > digi.log 2>&1 || exit $? ; # too many output, log into file
+xrdcp root://cmseos.fnal.gov//store/user/cmantill/JME-RunIISummer19UL17DIGIPremix-00010_1_cfg.py .
+cmsRun JME-RunIISummer19UL17DIGIPremix-00010_1_cfg.py
+rm JME-RunIISummer19UL17DIGIPremix-00010_1_cfg.py
+rm digi.log
+rm sim.root
+ls -lrth 
 
 # begin HLT (UL only)
 if [ -r $RELEASE_HLT/src ] ; then
@@ -78,7 +91,10 @@ fi
 cd $RELEASE_HLT/src
 eval `scram runtime -sh`
 cd $WORKDIR
+echo "HLT"
 cmsDriver.py  --python_filename JME-RunIISummer19UL17HLT-00020_1_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --fileout file:hlt.root --conditions 94X_mc2017_realistic_v15 --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' --step HLT:2e34v40 --geometry DB:Extended --filein file:digi.root --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+rm digi.root
+ls -lrth 
 
 # begin RECO
 if [ -r $RELEASE/src ] ; then
@@ -89,14 +105,15 @@ fi
 cd $RELEASE/src
 eval `scram runtime -sh`
 cd $WORKDIR
+echo "RECO"
 cmsDriver.py  --python_filename JME-RunIISummer19UL17RECO-00020_1_cfg.py --eventcontent AODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier AODSIM --fileout file:reco.root --conditions 106X_mc2017_realistic_v6 --step RAW2DIGI,L1Reco,RECO,RECOSIM --geometry DB:Extended --filein file:hlt.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+rm hlt.root
 
 # begin MiniAOD and MiniAODv2 (in 20UL config)
 cmsDriver.py  --python_filename JME-RunIISummer19UL17MiniAOD-00020_1_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniaod.root --conditions 106X_mc2017_realistic_v6 --step PAT --geometry DB:Extended --filein file:reco.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
 cmsDriver.py  --python_filename JME-RunIISummer19UL17MiniAOD-00020_1_cfg.py --eventcontent MINIAODSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier MINIAODSIM --fileout file:miniaod_20ul.root --conditions 106X_mc2017_realistic_v9 --step PAT --procModifiers run2_miniAOD_UL --geometry DB:Extended --filein file:reco.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
-mv lhegen_inRAWSIM.root lhegen_inRAWSIM_${SEED}.root
 mv miniaod.root miniaod_${SEED}.root
 mv miniaod_20ul.root miniaod_20ul_${SEED}.root
 
