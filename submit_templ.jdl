@@ -3,6 +3,7 @@ Log        = DIRECTORY/logs/job.log_$(Cluster)
 Output     = DIRECTORY/logs/job.out_$(Cluster)-$(Process)
 Error      = DIRECTORY/logs/job.err_$(Cluster)-$(Process)
 
+request_memory          = 4200
 should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
 transfer_input_files    = LOCDIR/fragments, LOCDIR/genmodules.tgz, LOCDIR/run_generic_tarball_cvmfs_jhu.sh
@@ -11,4 +12,6 @@ use_x509userproxy       = true
 x509userproxy           = PROXY
 
 Arguments = 1000 $(SEED) 2 
+#Arguments = 1 $(SEED) 2
+
 Queue SEED from SEEDFILE
