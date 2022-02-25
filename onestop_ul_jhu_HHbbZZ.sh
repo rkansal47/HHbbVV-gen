@@ -33,7 +33,7 @@ eval `scram runtime -sh`
 # git cms-addpkg GeneratorInterface/Core
 # git cms-addpkg GeneratorInterface/LHEInterface
 tar xzf $WORKDIR/$CMSTARBALL
-sed -i "s/run_generic_tarball_cvmfs/run_generic_tarball_cvmfs_jhu/g" GeneratorInterface/Core/src/BaseHadronizer.cc
+sed -i "s/run_generic_tarball_cvmfs/run_generic_tarball_cvmfs_jhu_ZZ/g" GeneratorInterface/Core/src/BaseHadronizer.cc
 cp $WORKDIR/$LHESCRIPT GeneratorInterface/LHEInterface/data/$LHESCRIPT
 chmod +x GeneratorInterface/LHEInterface/data/$LHESCRIPT
 # git cms-checkdeps -a # to save time because we don't change much of the code

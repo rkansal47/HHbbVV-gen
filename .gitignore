@@ -3,3 +3,5 @@ CMSSW*
 *.root
 .*
 *cfg.py
+condor
+lheevent
