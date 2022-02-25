@@ -33,6 +33,7 @@ generator = cms.EDFilter(
             "25:onMode = off",
             "25:onIfMatch = 5 -5",
             '25:onIfMatch = 24 -24',
+            '24:mMin = 0.05',
             "ResonanceDecayFilter:filter = on",
             "ResonanceDecayFilter:mothers = 25",
             "ResonanceDecayFilter:daughters = 5,5,24,24",
