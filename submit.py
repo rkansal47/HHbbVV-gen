@@ -13,17 +13,21 @@ def main(args):
     localexecutable = f"{locdir}/{executable}"
     odir = f"/store/user/lpcdihiggsboost/gen/{sample}/ULv1/{tag}/"
     odir_ul = f"/store/user/lpcdihiggsboost/gen/{sample}/ULv2/{tag}/"
+    odir_lhe = f"/store/user/lpcdihiggsboost/gen/{sample}/LHE/{tag}/"
     os.system(f'mkdir -p /eos/uscms/{odir}')
     os.system(f'mkdir -p /eos/uscms/{odir_ul}')
+    #os.system(f'mkdir -p /eos/uscms/{odir_lhe}')
 
     odir = f"root://cmseos.fnal.gov/{odir}"
     odir_ul = f"root://cmseos.fnal.gov/{odir_ul}"
+    #odir_lhe = f"root://cmseos.fnal.gov/{odir_lhe}"
 
     exe_templ_file = open(executable)
     exe_file = open(localexecutable, "w")
     for line in exe_templ_file:
         line = line.replace("OUTPUT_DIR", odir)
         line = line.replace("OUTPUT_ULDIR", odir_ul)
+        #line = line.replace("OUTPUT_DIR_LHE", odir_lhe)
         exe_file.write(line)
     exe_file.close()
     exe_templ_file.close()
@@ -46,6 +50,10 @@ def main(args):
         line = line.replace("LOCDIR", cwd)
         line = line.replace("SEEDFILE", seedfile)
         line = line.replace("PROXY", proxy)
+        if args.mx:
+            line = line.replace("MX", "%i"%args.mx)
+        if args.my:
+            line = line.replace("MY", "%i"%args.my)
         condor_file.write(line)
     condor_file.close()
     condor_templ_file.close()
@@ -57,10 +65,12 @@ if __name__ == "__main__":
             
     parser = argparse.ArgumentParser()
     parser.add_argument("--tag",       dest="tag",       default="Test",                help="process tag", type=str)
-    parser.add_argument('--sample',    dest='sample',    choices=["jhu_HHbbWW","pythia_HHbbWW","jhu_HHbbZZ"], help='sample')
+    parser.add_argument('--sample',    dest='sample',    choices=["XHY","jhu_HHbbWW","pythia_HHbbWW","jhu_HHbbZZ"], help='sample')
     parser.add_argument("--submit",    dest='submit',    action='store_true',           help="submit jobs when created")
     parser.add_argument("--start",     dest='start',     default=1,                     help="start seed >0", type=int)
     parser.add_argument("--end",       dest='end',       default=1000,                  help="endseed", type=int)
+    parser.add_argument("--mx",        dest='mx',        default=None,                  help="mx", type=int)
+    parser.add_argument("--my",        dest='my',        default=None,                  help="my", type=int)
     args = parser.parse_args()
 
     main(args)
