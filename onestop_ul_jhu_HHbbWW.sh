@@ -63,12 +63,14 @@ echo $FRAGMENT0
 #process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})"
 cmsDriver.py Configuration/GenProduction/python/$FRAGMENT0 --python_filename JME-RunIISummer19UL17GEN-00016_1_cfg.py --eventcontent LHE,RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier LHE,GEN --fileout file:lhegen.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --customise_commands "process.source.numberEventsInLuminosityBlock = cms.untracked.uint32(200)"\\nprocess.source.numberEventsInLuminosityBlock="cms.untracked.uint32(100)"\\nprocess.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" --step LHE,GEN --geometry DB:Extended --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 ls -lrth 
+#xrdcp -r -f lhegen_inRAWSIM.root OUTPUT_DIR_LHE/lhegen_${SEED}.root
 
 # begin SIM
 echo "SIM"
 cmsDriver.py  --python_filename JME-RunIISummer19UL17SIM-00010_1_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --fileout file:sim.root --conditions 106X_mc2017_realistic_v6 --beamspot Realistic25ns13TeVEarly2017Collision --step SIM --geometry DB:Extended --filein file:lhegen_inRAWSIM.root --era Run2_2017 --runUnscheduled --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 #rm lhegen.root
 #rm lhegen_inRAWSIM.root
+
 rm -rf lheevent
 ls -lrth 
 
@@ -117,5 +119,5 @@ cmsDriver.py  --python_filename JME-RunIISummer19UL17MiniAOD-00020_1_cfg.py --ev
 mv miniaod.root miniaod_${SEED}.root
 mv miniaod_20ul.root miniaod_20ul_${SEED}.root
 
-xrdcp -r -f miniaod_${SEED}.root OUTPUT_DIR/miniaod_${SEED}.root
-xrdcp -r -f miniaod_20ul_${SEED}.root OUTPUT_ULDIR/miniaod_20ul_${SEED}.root
+xrdcp -f miniaod_${SEED}.root OUTPUT_DIR/miniaod_${SEED}.root
+xrdcp -f miniaod_20ul_${SEED}.root OUTPUT_ULDIR/miniaod_20ul_${SEED}.root
