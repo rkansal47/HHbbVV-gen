@@ -11,8 +11,13 @@ def main(args):
     localcondor = f"{locdir}/submit_{sample}.jdl"
     executable = f"onestop_ul_{sample}.sh"
     localexecutable = f"{locdir}/{executable}"
-    odir = f"root://cmseos.fnal.gov//store/user/lpcdihiggsboost/gen/{sample}/ULv1/{tag}/"
-    odir_ul = f"root://cmseos.fnal.gov//store/user/lpcdihiggsboost/gen/{sample}/ULv2/{tag}/"
+    odir = f"/store/user/lpcdihiggsboost/gen/{sample}/ULv1/{tag}/"
+    odir_ul = f"/store/user/lpcdihiggsboost/gen/{sample}/ULv2/{tag}/"
+    os.system(f'mkdir -p /eos/uscms/{odir}')
+    os.system(f'mkdir -p /eos/uscms/{odir_ul}')
+
+    odir = f"root://cmseos.fnal.gov/{odir}"
+    odir_ul = f"root://cmseos.fnal.gov/{odir_ul}"
 
     exe_templ_file = open(executable)
     exe_file = open(localexecutable, "w")
@@ -26,7 +31,7 @@ def main(args):
     proxy = os.environ["X509_USER_PROXY"]
 
     cwd = os.getcwd()
-    
+
     seedfile = f"{locdir}/seed.txt"
     f = open(seedfile, "w")
     for i in range(args.start,args.end):
