@@ -10,3 +10,8 @@ Running a job:
 ```
 python3 submit.py --sample jhu_HHbbWW --tag Feb23 --start 1 --end 1000
 ```
+
+For XHY:
+```
+source onestop_ul_XHY.sh 10 10 2 1200 60
+```

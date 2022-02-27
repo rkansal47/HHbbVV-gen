@@ -106,5 +106,5 @@ cmsDriver.py  --python_filename JME-RunIISummer19UL17MiniAOD-00020_1_cfg.py --ev
 mv miniaod.root miniaod_${SEED}.root
 mv miniaod_20ul.root miniaod_20ul_${SEED}.root
 
-xrdcp -r -f miniaod_${SEED}.root OUTPUT_DIR/miniaod_${SEED}.root
-xrdcp -r -f miniaod_20ul_${SEED}.root OUTPUT_ULDIR/miniaod_20ul_${SEED}.root
+xrdcp -f miniaod_${SEED}.root OUTPUT_DIR/miniaod_${SEED}.root
+xrdcp -f miniaod_20ul_${SEED}.root OUTPUT_ULDIR/miniaod_20ul_${SEED}.root

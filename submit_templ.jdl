@@ -11,8 +11,8 @@ transfer_output_files   = ""
 use_x509userproxy       = true
 x509userproxy           = PROXY
 
-#Arguments = 1000 $(SEED) 2 
-Arguments = 1 $(SEED) 2
+Arguments = 1000 $(SEED) 2 
+#Arguments = 1 $(SEED) 2
 #Arguments = 1000 $(SEED) 2 MX MY
 
 Queue SEED from SEEDFILE

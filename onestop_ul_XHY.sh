@@ -9,7 +9,9 @@ env
 NEVENT=$1
 SEED=$2 # no use here
 NTHREAD=$3
-FRAGMENT=fragments/HHToBBVVToBBQQQQ_cHHH1_pythia_fragment.py
+MX=$4
+MY=$5
+FRAGMENT=fragments/NMSSM_XtoHYggbb_fragment.py
 CMSTARBALL=genmodules.tgz
 [ -f $FRAGMENT ] || exit $? ;
 
@@ -19,12 +21,13 @@ export SCRAM_ARCH=slc7_amd64_gcc700
 export RELEASE=CMSSW_10_6_29
 export RELEASE_HLT=CMSSW_9_4_14_UL_patch1
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-
+"""
 if [ -r $RELEASE/src ] ; then
   echo release $RELEASE already exists
 else
   scram p CMSSW $RELEASE
 fi
+"""
 cd $RELEASE/src
 eval `scram runtime -sh`
 
@@ -36,10 +39,17 @@ cp $WORKDIR/$FRAGMENT Configuration/GenProduction/python
 ls -lrth Configuration/GenProduction/python/
 # replace the event number (no __NEVENT__ in this fragment)
 sed "s/__NEVENT__/$NEVENT/g" -i Configuration/GenProduction/python/$FRAGMENT0
+echo $WORKDIR
+line_old="__TMP__"
+sed "s|$line_old|$WORKDIR|g" -i Configuration/GenProduction/python/$FRAGMENT0
+sed "s/MMX/$MX/g" -i Configuration/GenProduction/python/$FRAGMENT0
+sed "s/MMY/$MY/g" -i Configuration/GenProduction/python/$FRAGMENT0
 eval `scram runtime -sh`
 scram b -j $NTHREAD
 
 cd $WORKDIR
+
+xrdcp root://cmseos.fnal.gov//store/user/cmantill/HHbbgg/gridpacks/NMSSM_XYH_ggbb_MX_${MX}_MY_${MY}_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz  .
 
 # following workflows copied from https://cms-pdmv.cern.ch/mcm/chained_requests?prepid=JME-chain_RunIISummer19UL17GEN_flowRunIISummer19UL17SIM_flowRunIISummer19UL17DIGIPremix_flowRunIISummer19UL17HLT_flowRunIISummer19UL17RECO_flowRunIISummer19UL17MiniAOD_flowRunIISummer19UL17NanoAOD-00008&page=0&shown=15
 # note this is a deprecated routine
@@ -69,7 +79,7 @@ fi
 cd $RELEASE_HLT/src
 eval `scram runtime -sh`
 cd $WORKDIR
-cmsDriver.py  --python_filename JME-RunIISummer19UL17HLT-00020_1_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --fileout file:hlt.root --conditions 94X_mc2017_realistic_v15 --customise_commands 'process.source.bypassVersionCheck = cms.untracked.bool(True)' --step HLT:2e34v40 --geometry DB:Extended --filein file:digi.root --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
+cmsDriver.py  --python_filename JME-RunIISummer19UL17HLT-00020_1_cfg.py --eventcontent RAWSIM --customise Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM-RAW --fileout file:hlt.root --conditions 94X_mc2017_realistic_v15 --customise_commands "process.source.bypassVersionCheck = cms.untracked.bool(True)" --step HLT:2e34v40 --geometry DB:Extended --filein file:digi.root --era Run2_2017 --mc --nThreads $NTHREAD -n $NEVENT || exit $? ;
 
 # begin RECO
 if [ -r $RELEASE/src ] ; then
