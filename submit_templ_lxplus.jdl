@@ -8,8 +8,8 @@ should_transfer_files   = YES
 when_to_transfer_output = ON_EXIT_OR_EVICT
 transfer_input_files    = LOCDIR/fragments, LOCDIR/genmodules.tgz, LOCDIR/run_generic_tarball_cvmfs_jhu.sh, LOCDIR/run_generic_tarball_cvmfs_jhu_ZZ.sh
 transfer_output_files   = ""
-# use_x509userproxy       = true
-# x509userproxy           = PROXY
+use_x509userproxy       = true
+x509userproxy           = PROXY
 
 # arguments = 1000 $(SEED) 2
 arguments = 1 $(SEED) 2
