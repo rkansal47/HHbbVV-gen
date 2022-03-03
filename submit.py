@@ -42,8 +42,8 @@ def main(args):
     exe_templ_file = open(executable)
     exe_file = open(localexecutable, "w")
     for line in exe_templ_file:
-        line = line.replace("OUTPUT_DIR", odir)
-        line = line.replace("OUTPUT_ULDIR", odir_ul)
+        line = line.replace("OUTPUT_DIR", f"{redirector}{odir}")
+        line = line.replace("OUTPUT_ULDIR", f"{redirector}{odir_ul}")
         # line = line.replace("OUTPUT_DIR_LHE", odir_lhe)
         exe_file.write(line)
     exe_file.close()
