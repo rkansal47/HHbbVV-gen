@@ -11,8 +11,8 @@ transfer_output_files   = ""
 use_x509userproxy       = true
 x509userproxy           = PROXY
 
-# arguments = 1000 $(SEED) 2
-arguments = 1 $(SEED) 2
+arguments = 1000 $(SEED) 2
+# arguments = 1 $(SEED) 2
 # arguments = 1000 $(SEED) 2 MX MY
 
 +JobFlavour = "testmatch"
